@@ -13,6 +13,8 @@ A scalable data pipeline for performing sentiment analysis on hotel reviews usin
 
 ## 📋 Architecture
 
+![Architecture Diagram](./architecture-diagram.png)
+
 The pipeline consists of:
 - **1 Host Node**: Runs MinIO (S3-compatible storage) and Dask scheduler
 - **4 Worker Nodes**: Execute Dask workers and host the Dagster orchestrator
