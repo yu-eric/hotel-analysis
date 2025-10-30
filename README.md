@@ -13,7 +13,7 @@ A scalable data pipeline for performing sentiment analysis on hotel reviews usin
 
 ## 📋 Architecture
 
-![Architecture Diagram](./architecture-diagram.png)
+![Architecture Diagram](./architecture.png)
 
 The pipeline consists of:
 - **1 Host Node**: Runs MinIO (S3-compatible storage) and Dask scheduler
@@ -213,8 +213,7 @@ This project was developed as a demonstration of distributed data engineering pa
 
 ## 📄 License
 
-This project is available for educational and reference purposes.
-
+This project is available under the MIT license. See [LICENSE](https://github.com/yu-eric/hotel-analysis/blob/master/LICENSE) for more details.
 ## 🙏 Acknowledgments
 
 - Dataset: [Hotel Reviews Dataset](https://www.kaggle.com/datasets/jiashenliu/515k-hotel-reviews-data-in-europe)
