@@ -211,8 +211,7 @@ This project was developed as a demonstration of distributed data engineering pa
 
 ## 📄 License
 
-This project is available for educational and reference purposes.
-
+This project is available under the MIT license. See [LICENSE](https://github.com/yu-eric/hotel-analysis/blob/master/LICENSE) for more details.
 ## 🙏 Acknowledgments
 
 - Dataset: [Hotel Reviews Dataset](https://www.kaggle.com/datasets/jiashenliu/515k-hotel-reviews-data-in-europe)
