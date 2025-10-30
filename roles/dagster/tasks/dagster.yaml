@@ -1,0 +1,30 @@
+- name: Setup dagster
+  become: true
+  copy:
+    dest: /etc/systemd/system/dagster.service
+    content: |
+      [Unit]
+      Description=Dagster
+      After=network.target
+
+      [Service]
+      User=almalinux
+      WorkingDirectory=/home/almalinux/proj/roles/dagster/files
+      ExecStart=/home/almalinux/.local/bin/dagster dev -h 0.0.0.0 -m sentiment_analysis
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+
+- name: Reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- name: Start dagster 
+  become: true
+  systemd:
+    name: dagster
+    state: started
+    enabled: yes

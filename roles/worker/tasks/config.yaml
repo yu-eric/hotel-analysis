@@ -1,0 +1,12 @@
+- name: Create dask config directory
+  become: true
+  ansible.builtin.file:
+    path: /home/almalinux/.config/dask/
+    state: directory
+    mode: '0755'
+
+- name: Copy config
+  become: true
+  ansible.builtin.copy:
+    src: distributed.yaml
+    dest: /home/almalinux/.config/dask/

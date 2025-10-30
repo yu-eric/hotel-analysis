@@ -1,0 +1,177 @@
+
+- name: Create minio group
+  become: true
+  ansible.builtin.group:
+    name: minio-user
+    state: present
+
+- name: Create minio user
+  become: true
+  ansible.builtin.user:
+    append: true
+    groups: minio-user
+    password: "!"
+    password_lock: true
+    state: present
+    name: minio-user
+
+- name: Copy TLS generation stub
+  become: true
+  ansible.builtin.copy:
+    mode: "0700"
+    src: "generate_certs.sh"
+    dest: "/root/generate_certs.sh"  
+
+- name: Create certificate
+  become: true
+  ansible.builtin.shell: "bash /root/generate_certs.sh {{inventory_hostname}}"
+
+- name: Create minio settings directory
+  become: true
+  ansible.builtin.file:
+    name: "/home/minio-user/.minio"
+    state: directory
+    owner: minio-user
+    group: minio-user
+
+- name: Create minio settings directory
+  become: true
+  ansible.builtin.file:
+    name: "/home/minio-user/.minio/certs"
+    state: directory
+    owner: minio-user
+    group: minio-user      
+
+- name: Create minio client settings directory
+  become: true
+  ansible.builtin.file:
+    name: "/home/almalinux/.mc"
+    state: directory
+    owner: almalinux
+    group: almalinux
+
+- name: Create minio client certs directory
+  become: true
+  ansible.builtin.file:
+    name: "/home/almalinux/.mc/certs"
+    state: directory
+    owner: almalinux
+    group: almalinux
+
+- name: Create minio client CA directory
+  become: true
+  ansible.builtin.file:
+    name: "/home/almalinux/.mc/certs/CAs"
+    state: directory
+    owner: almalinux
+    group: almalinux
+
+- name: Copy the certificate to the minio-user directory
+  become: true
+  ansible.builtin.copy:
+    remote_src: true
+    owner: minio-user
+    group: minio-user
+    mode: "0600"
+    src: "/root/minio.crt"
+    dest: "/home/minio-user/.minio/certs/public.crt"
+
+- name: Copy the key to the minio-user directory
+  become: true
+  ansible.builtin.copy:
+    remote_src: true
+    owner: minio-user
+    group: minio-user
+    mode: "0600"
+    src: "/root/minio.key"
+    dest: "/home/minio-user/.minio/certs/private.key"
+
+- name: Copy the certificate to the almalinux mc directory
+  become: true
+  ansible.builtin.copy:
+    remote_src: true
+    owner: almalinux
+    group: almalinux
+    mode: "0600"
+    src: "/root/minio.crt"
+    dest: "/home/almalinux/.mc/certs/{{inventory_hostname}}.crt"
+
+- name: Copy the certificate to the almalinux mc CA directory
+  become: true
+  ansible.builtin.copy:
+    remote_src: true
+    owner: almalinux
+    group: almalinux
+    mode: "0600"
+    src: "/root/minio.crt"
+    dest: "/home/almalinux/.mc/certs/CAs/local.crt"
+
+- name: Create minio sub-dir of /data
+  become: true
+  ansible.builtin.file:
+    path: /data/minio
+    owner: minio-user
+    group: minio-user
+    mode: "0700"
+    state: directory
+
+- name: Get Minio RPM
+  become: true
+  ansible.builtin.get_url:
+    dest: "/root/minio.rpm"
+    url: "https://dl.min.io/server/minio/release/linux-amd64/minio.rpm"
+
+- name: Install Minio RPM
+  become: true
+  ansible.builtin.shell: dnf install -y /root/minio.rpm
+
+- name: Install Minio command-line
+  become: true
+  ansible.builtin.get_url:
+    dest: /usr/local/bin/mc
+    url: "https://dl.min.io/client/mc/release/linux-amd64/mc"
+    mode: "0755"
+
+- name: Set up environment file
+  become: true
+  ansible.builtin.template:
+    src: files/minio.j2
+    dest: /etc/default/minio
+    owner: root
+    group: minio-user
+    mode: "0640"
+
+- name: Start Minio
+  become: true
+  ansible.builtin.systemd_service:
+    name: minio
+    state: started
+    enabled: true
+
+- name: Copy minio pass to almalinux directory
+  become: true
+  ansible.builtin.copy:
+    owner: almalinux
+    group: almalinux
+    mode: "0600"
+    src: "./.miniopass"
+    dest: "/home/almalinux/miniopass"
+
+- name: Setup mc for local access
+  become: true
+  ansible.builtin.template:
+    src: files/mc_config.json.j2
+    dest: /home/almalinux/.mc/config.json
+    owner: almalinux
+    group: almalinux
+    mode: "0600"
+
+- name: Setup aliases
+  # Update this URL to match your S3-compatible storage endpoint
+  command: mc alias set eda2 https://your-s3-endpoint.example.com/ minioadmin minioadmin
+
+- name: Setup bucket
+  command: mc mb --ignore-existing eda2/dask
+
+- name: Set policy
+  command: mc anonymous set public eda2/dask

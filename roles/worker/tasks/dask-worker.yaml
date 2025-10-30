@@ -1,0 +1,29 @@
+- name: Run dask worker
+  become: true
+  copy:
+    dest: /etc/systemd/system/dask-worker.service
+    content: |
+      [Unit]
+      Description=Dask Worker
+      After=network.target
+
+      [Service]
+      User=almalinux
+      ExecStart=/home/almalinux/.local/bin/dask worker tcp://{{ hostvars[groups['workers'][0]]['ansible_eth0']['ipv4']['address'] }}:8786 --memory-limit="26GiB" --dashboard-address 8787 --worker-port 8782:8785 --nworkers 4
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+
+- name: Reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- name: Start worker
+  become: true
+  systemd:
+    name: dask-worker
+    state: started
+    enabled: yes

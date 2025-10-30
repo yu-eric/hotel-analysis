@@ -1,0 +1,85 @@
+- name: Install dependencies
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - python3-pip
+      - python3-devel
+      - python3-virtualenv
+      - git
+      - wget
+      - gcc
+      - gcc-c++
+      - make
+      - cmake
+      - tar
+      - firewalld
+      - python3-psycopg2
+      - unzip
+      - htop
+    state: latest
+
+- name: Install older grpcio
+  ansible.builtin.pip:
+    name:
+      - grpcio==1.57.0
+      - grpcio-health-checking==1.57.0
+
+
+- name: Install CPU only torch
+  ansible.builtin.pip:
+    name:
+      - torch
+    state: latest
+    extra_args: --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu
+
+- name: Install all Python packages
+  ansible.builtin.pip:
+    name:
+      - pandas
+      - dask[complete]
+      - distributed
+      - dagster
+      - dagster-webserver
+      - dagster-dask
+      - psycopg
+      - transformers
+      - SQLAlchemy
+      - tokenizers
+      - jupyter-server-proxy
+      - s3fs
+    state: latest
+
+# - name: Check if Python 3.13 is already installed
+#   register: validatepython
+#   shell: command -v python3.13
+#   ignore_errors: yes
+
+# - name: Install latest Python
+#   become: true
+#   shell: |  
+#     wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tgz
+#     tar -xzf Python-3.13.3.tgz
+#     cd Python-3.13.3/
+#     ./configure --enable-optimizations
+#   when: validatepython.stdout == ""
+ 
+# - name: Build python
+#   args:
+#     chdir: /home/almalinux/Python-3.13.3/
+#   become: true
+#   command: make altinstall
+#   when: validatepython.stdout == ""
+
+# - name: Set aliases
+#   become: true
+#   shell: |  
+#     echo "alias pip='pip3.13'" >> /home/almalinux/.bashrc
+#     echo "alias python='python3.13'" >> /home/almalinux/.bashrc
+#     source /home/almalinux/.bashrc
+#   when: validatepython.stdout == ""
+
+# - name: pip self-update
+#   pip:
+#     name: pip
+#     state: latest
+

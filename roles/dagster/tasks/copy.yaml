@@ -1,0 +1,5 @@
+- name: Unzip csv
+  command: unzip -o /home/almalinux/proj/roles/dagster/files/data/reviews.zip -d /home/almalinux/proj/roles/dagster/files/data/
+
+- name: Move files to Minio
+  command: mc cp --recursive /home/almalinux/proj/roles/dagster/files/data/ eda2/dask/

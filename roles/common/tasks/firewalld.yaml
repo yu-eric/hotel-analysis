@@ -1,0 +1,75 @@
+- name: Start firewall
+  systemd:
+    name: firewalld
+    state: started
+  ignore_errors: yes
+  become: true
+  become_user: root
+
+- name: Allow HTTP through firewall
+  firewalld:
+    port: 80/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  ignore_errors: yes
+  become: true
+  become_user: root
+
+- name: Allow dask through firewall
+  firewalld:
+    port: 8782-8787/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  ignore_errors: yes
+  become: true
+  become_user: root
+
+- name: Allow https through firewall
+  firewalld:
+    port: 443/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  ignore_errors: yes
+  become: true
+  become_user: root
+
+- name: Allow PostgreSQL through firewall
+  firewalld:
+    port: 5432/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  ignore_errors: yes
+  become: true
+  become_user: root
+
+- name: Allow dagster through firewall
+  firewalld:
+    port: 3000/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  ignore_errors: yes
+  become: true
+  become_user: root
+
+- name: Allow minio through firewall
+  firewalld:
+    port: 9000-9001/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  ignore_errors: yes
+  become: true
+  become_user: root
+
+- name: Reload firewall
+  systemd:
+    name: firewalld
+    state: reloaded
+  ignore_errors: yes
+  become: true
+  become_user: root

@@ -1,0 +1,5 @@
+---
+- import_tasks: selinux.yaml
+- import_tasks: tools.yaml
+- import_tasks: firewalld.yaml
+- import_tasks: reboot.yaml

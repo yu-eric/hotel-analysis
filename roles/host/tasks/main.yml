@@ -1,0 +1,4 @@
+---
+- import_tasks: dask-scheduler.yaml
+- import_tasks: postgres.yaml
+- import_tasks: minio.yaml

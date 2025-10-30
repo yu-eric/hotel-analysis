@@ -1,0 +1,12 @@
+distributed:
+  scheduler:
+    active-memory-manager:
+      measure: managed
+
+  worker:
+    memory:
+      rebalance:
+        measure: managed
+      spill: false
+      pause: false
+      terminate: false

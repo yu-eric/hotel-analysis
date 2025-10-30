@@ -1,0 +1,47 @@
+- name: Install PostgreSQL
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - postgresql-server
+      - postgresql
+      - postgresql-contrib
+    state: present
+    update_cache: yes
+
+- name: Setup PostgreSQL
+  become: true
+  ansible.builtin.command:
+    cmd: postgresql-setup --initdb
+    creates: /var/lib/pgsql/data/PG_VERSION
+
+- name: Start PostgreSQL
+  become: true
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Create database for dagster
+  community.postgresql.postgresql_db:
+    name: "dagster"
+    encoding: "UTF-8"
+  become: true
+  become_user: postgres
+
+- name: Create user
+  community.postgresql.postgresql_user:
+    db: "dagster"
+    name: "almalinux"
+  become: true
+  become_user: postgres
+
+- name: Allow almalinux to use db without login
+  community.postgresql.postgresql_pg_hba:
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    contype: local
+    users: almalinux
+    databases: dagster
+    method: trust
+    create: true
+  become: true
+  become_user: postgres

@@ -1,0 +1,16 @@
+---
+- hosts: workers
+  roles:
+  - common
+
+- hosts: "{{ hostvars[groups['workers'][0]]['ansible_eth0']['ipv4']['address'] }}"
+  roles:
+  - host
+
+- hosts: workers
+  roles:
+  - worker
+
+- hosts: "{{ hostvars[groups['workers'][0]]['ansible_eth0']['ipv4']['address'] }}"
+  roles:
+  - dagster 

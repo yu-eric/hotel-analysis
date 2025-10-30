@@ -1,0 +1,29 @@
+- name: Run dask scheduler
+  become: true
+  copy:
+    dest: /etc/systemd/system/dask-scheduler.service
+    content: |
+      [Unit]
+      Description=Dask Scheduler
+      After=network.target
+
+      [Service]
+      User=almalinux
+      ExecStart=/home/almalinux/.local/bin/dask scheduler
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+
+- name: Reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- name: Start scheduler
+  become: true
+  systemd:
+    name: dask-scheduler
+    state: started
+    enabled: yes
